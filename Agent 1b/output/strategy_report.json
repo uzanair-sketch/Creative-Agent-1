@@ -2,49 +2,44 @@
   "competitor_insights": [
     {
       "competitor_name": "La Colombe Draft Latte",
-      "winning_creative_pattern": "Smooth macro pouring clips combined with lifestyle UGC overlays highlighting texture.",
-      "creative_opportunity_gap": "Visually underwhelms on kinetic impact and hyper-tactile audio; we can outperform using 1000fps ice destruction and pressurized nitrogen shock visuals."
+      "winning_creative_pattern": "Focuses heavily on smooth liquid cascade pouring shots paired with upbeat urban lifestyle cuts.",
+      "creative_opportunity_gap": "Lacks raw, sensory-driven macro impacts and tactile ASMR sound design that creates immediate stop-scroll friction."
     },
     {
-      "competitor_name": "Super Coffee",
-      "winning_creative_pattern": "Problem-solution hooks emphasizing zero-sugar/high-protein claims with bright text banners.",
-      "creative_opportunity_gap": "Lacks moody aesthetic luxury; we can capture high-intent coffee purists by leaning into dark, cinematic luxury visuals with visceral sensory sound design."
-    },
-    {
-      "competitor_name": "Chamberlain Coffee",
-      "winning_creative_pattern": "Pastel color schemes, casual relaxed pacing, and soft ASMR pouring sounds for Gen-Z audience.",
-      "creative_opportunity_gap": "Completely misses high-energy, premium dark roast enthusiasts; our high-contrast, moody visual approach fills the luxury performance niche."
+      "competitor_name": "Rise Brewing Co.",
+      "winning_creative_pattern": "Uses bright, pop-art color palettes with fast energetic jump cuts emphasizing organic ingredients.",
+      "creative_opportunity_gap": "Misses out on dark, premium cinematic contrast and moody luxury aesthetics that resonate with high-end coffee enthusiasts."
     }
   ],
   "high_retention_hooks": [
     {
-      "hook_type": "Pattern Interrupt",
-      "visual_hook_description": "A hand violently slams a matte black Solstice can onto a thick block of clear ice at 1000fps, shattering crystal shards directly into the camera lens.",
-      "on_screen_text": "STOP DRINKING WATERED-DOWN COFFEE",
-      "audio_hook": "Loud, hyper-crisp ice-shattering crack layered with a deep, vibrating sub-bass drop.",
-      "retention_rationale": "Violent physical impact combined with macro ice dynamics forces an immediate scroll-stop within the first 0.5 seconds."
+      "hook_type": "Sensory Shock",
+      "visual_hook_description": "A hand slams a matte black Solstice can onto a crystal-clear block of ice in ultra-slow motion (1000fps), shattering it into violent crystal shards toward the camera lens.",
+      "on_screen_text": "STOP DRINKING WATERED-DOWN COFFEE.",
+      "audio_hook": "Loud hyper-crisp ice-shattering crack layered with a heavy sub-bass impact drop.",
+      "retention_rationale": "High visual speed contrast and intense tactile sound shock instantly break mindless feed scrolling within 0.5 seconds."
     },
     {
-      "hook_type": "Sensory Shock",
-      "visual_hook_description": "Extreme macro top-down view of nitrogen valve popping with explosive white mist blowing condensation directly across the camera lens.",
-      "on_screen_text": "WARNING: HIGH-PRESSURE NITRO INSIDE",
-      "audio_hook": "Explosive pressurized PSHHH snap with dynamic stereo panning.",
-      "retention_rationale": "Simulates 3D environmental reaction on mobile screens, triggering a visceral sensory response."
+      "hook_type": "Pattern Interrupt",
+      "visual_hook_description": "Shot begins on a standard boring drip coffee pot slowly dropping coffee, which is instantly slashed in half by a high-speed nitro mist spray.",
+      "on_screen_text": "YOUR MORNING COFFEE IS DEAD.",
+      "audio_hook": "Dull ambient kitchen silence abruptly ripped apart by an explosive pressurized nitrogen hiss.",
+      "retention_rationale": "Subverts traditional coffee commercial expectations by physically destroying standard imagery."
     },
     {
       "hook_type": "Curiosity Gap",
-      "visual_hook_description": "Nitro cold brew pouring in reverse slow-motion, creating an inverted cascading cream waterfall effect inside a clear glass.",
-      "on_screen_text": "WHY IS THIS COFFEE FLOWING UPWARDS?",
-      "audio_hook": "Hypnotic low-frequency hum fading rapidly into crisp liquid crackle.",
-      "retention_rationale": "Visual trickery creates a cognitive pause, driving viewers to watch the next 3 seconds to resolve the confusion."
+      "visual_hook_description": "Extreme micro-macro close up of swirling black velvet liquid surging with glowing golden micro-bubbles.",
+      "on_screen_text": "WHY IS EVERYONE DITCHING ESPRESSO?",
+      "audio_hook": "Low resonant whisper: The dark side of energy...",
+      "retention_rationale": "Piques cognitive curiosity by posing a question that challenges routine behavior alongside hypnotic micro-visuals."
     }
   ],
   "selected_primary_hook": {
-    "hook_type": "Pattern Interrupt",
-    "visual_hook_description": "A hand violently slams a matte black Solstice can onto a thick block of clear ice at 1000fps, shattering crystal shards directly into the camera lens.",
-    "on_screen_text": "STOP DRINKING WATERED-DOWN COFFEE",
-    "audio_hook": "Loud, hyper-crisp ice-shattering crack layered with a deep, vibrating sub-bass drop.",
-    "retention_rationale": "Violent physical impact combined with macro ice dynamics forces an immediate scroll-stop within the first 0.5 seconds."
+    "hook_type": "Sensory Shock",
+    "visual_hook_description": "A hand slams a matte black Solstice can onto a crystal-clear block of ice in ultra-slow motion (1000fps), shattering it into violent crystal shards toward the camera lens.",
+    "on_screen_text": "STOP DRINKING WATERED-DOWN COFFEE.",
+    "audio_hook": "Loud hyper-crisp ice-shattering crack layered with a heavy sub-bass impact drop.",
+    "retention_rationale": "High visual speed contrast and intense tactile sound shock instantly break mindless feed scrolling within 0.5 seconds."
   },
   "optimized_cta": "CLAIM YOUR FREE TRIAL 4-PACK | TAP BELOW BEFORE STOCK RUNS OUT",
   "enriched_treatment": {
