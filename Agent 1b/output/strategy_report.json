@@ -1,51 +1,56 @@
 {
   "competitor_insights": [
     {
-      "competitor_name": "La Colombe Draft Latte",
-      "winning_creative_pattern": "Focuses heavily on smooth liquid cascade pouring shots paired with upbeat urban lifestyle cuts.",
-      "creative_opportunity_gap": "Lacks raw, sensory-driven macro impacts and tactile ASMR sound design that creates immediate stop-scroll friction."
+      "competitor_name": "La Colombe (Draft Latte)",
+      "winning_creative_pattern": "Focuses heavily on smooth liquid pour visuals and latte art texture in bright, airy morning settings.",
+      "creative_opportunity_gap": "Lacks high-energy dark-mode aesthetics and explosive tactile sound triggers that appeal to performance-focused professionals."
     },
     {
       "competitor_name": "Rise Brewing Co.",
-      "winning_creative_pattern": "Uses bright, pop-art color palettes with fast energetic jump cuts emphasizing organic ingredients.",
-      "creative_opportunity_gap": "Misses out on dark, premium cinematic contrast and moody luxury aesthetics that resonate with high-end coffee enthusiasts."
+      "winning_creative_pattern": "Uses casual UGC-style unboxing and quick-cut lifestyle montage videos.",
+      "creative_opportunity_gap": "Misses premium cinematic high-speed studio cinematography that visually justifies a higher premium price point."
+    },
+    {
+      "competitor_name": "Chamberlain Coffee",
+      "winning_creative_pattern": "Relies on vibrant pastel packaging and influencer lifestyle integrations.",
+      "creative_opportunity_gap": "Ignores sensory macro close-ups and high-contrast dark visual tones that stand out in feed scrolling."
     }
   ],
   "high_retention_hooks": [
     {
-      "hook_type": "Sensory Shock",
-      "visual_hook_description": "A hand slams a matte black Solstice can onto a crystal-clear block of ice in ultra-slow motion (1000fps), shattering it into violent crystal shards toward the camera lens.",
-      "on_screen_text": "STOP DRINKING WATERED-DOWN COFFEE.",
-      "audio_hook": "Loud hyper-crisp ice-shattering crack layered with a heavy sub-bass impact drop.",
-      "retention_rationale": "High visual speed contrast and intense tactile sound shock instantly break mindless feed scrolling within 0.5 seconds."
+      "hook_type": "Pattern Interrupt",
+      "visual_hook_description": "A hand slams a matte black Solstice can into a crystal ice block in 1000fps ultra slow-motion, sending sharp ice shards exploding into the frame.",
+      "on_screen_text": "STOP DRINKING WATERED-DOWN COFFEE \ud83d\udeab",
+      "audio_hook": "Ear-splitting ice shatter impact synced with a heavy sub-bass drop.",
+      "retention_rationale": "Violent kinetic movement and tactile destruction instantly shock the viewer, halting feed-scrolling within 0.5 seconds."
     },
     {
-      "hook_type": "Pattern Interrupt",
-      "visual_hook_description": "Shot begins on a standard boring drip coffee pot slowly dropping coffee, which is instantly slashed in half by a high-speed nitro mist spray.",
-      "on_screen_text": "YOUR MORNING COFFEE IS DEAD.",
-      "audio_hook": "Dull ambient kitchen silence abruptly ripped apart by an explosive pressurized nitrogen hiss.",
-      "retention_rationale": "Subverts traditional coffee commercial expectations by physically destroying standard imagery."
+      "hook_type": "Sensory Shock",
+      "visual_hook_description": "Extreme macro pull shot of a can tab popping, releasing an explosive plume of pressurized cold nitrogen mist directly into the lens.",
+      "on_screen_text": "THIS ISN'T NORMAL COFFEE \u26a1",
+      "audio_hook": "Hyper-crisp metallic snap followed by a loud, pressurized nitrogen blast.",
+      "retention_rationale": "Exploits ASMR sound design and macro depth-of-field to create an visceral reaction that hooks viewers."
     },
     {
       "hook_type": "Curiosity Gap",
-      "visual_hook_description": "Extreme micro-macro close up of swirling black velvet liquid surging with glowing golden micro-bubbles.",
-      "on_screen_text": "WHY IS EVERYONE DITCHING ESPRESSO?",
-      "audio_hook": "Low resonant whisper: The dark side of energy...",
-      "retention_rationale": "Piques cognitive curiosity by posing a question that challenges routine behavior alongside hypnotic micro-visuals."
+      "visual_hook_description": "Reverse phantom-cam shot of velvety micro-bubbles rapidly cascading upwards, assembling into a dark coffee vortex inside a sleek glass.",
+      "on_screen_text": "WHY ARE BARISTAS ANGRY AT THIS CAN? \ud83d\udc40",
+      "audio_hook": "Reversed audio vacuum swoosh snapping into instant silence.",
+      "retention_rationale": "Piques curiosity through visual illusion and bold controversial hook text, driving watch time."
     }
   ],
   "selected_primary_hook": {
     "hook_type": "Sensory Shock",
-    "visual_hook_description": "A hand slams a matte black Solstice can onto a crystal-clear block of ice in ultra-slow motion (1000fps), shattering it into violent crystal shards toward the camera lens.",
-    "on_screen_text": "STOP DRINKING WATERED-DOWN COFFEE.",
-    "audio_hook": "Loud hyper-crisp ice-shattering crack layered with a heavy sub-bass impact drop.",
-    "retention_rationale": "High visual speed contrast and intense tactile sound shock instantly break mindless feed scrolling within 0.5 seconds."
+    "visual_hook_description": "Extreme macro pull shot of a can tab popping, releasing an explosive plume of pressurized cold nitrogen mist directly into the lens.",
+    "on_screen_text": "THIS ISN'T NORMAL COFFEE \u26a1",
+    "audio_hook": "Hyper-crisp metallic snap followed by a loud, pressurized nitrogen blast.",
+    "retention_rationale": "Exploits ASMR sound design and macro depth-of-field to create a visceral reaction that hooks viewers in under 1 second."
   },
-  "optimized_cta": "CLAIM YOUR FREE TRIAL 4-PACK | TAP BELOW BEFORE STOCK RUNS OUT",
+  "optimized_cta": "CLAIM YOUR FREE 4-PACK NOW \u2014 TAP BELOW BEFORE STOCK RUNS OUT \u26a1",
   "enriched_treatment": {
     "brief_analysis": {
       "client_name": "Solstice Coffee Co.",
-      "core_objective": "Launch a new nitro canned cold brew with a high-energy, premium cinematic spot.",
+      "core_objective": "Launch a new nitro canned cold brew with a high-energy, premium cinematic spot optimized for viral retention.",
       "target_audience": "Urban young professionals and coffee enthusiasts aged 22-38.",
       "deliverables": [
         "1x 30s hero cut (16:9)",
@@ -72,61 +77,61 @@
     "shot_list": [
       {
         "shot_number": 1,
-        "scene_location": "INT. Studio - Macro Table",
+        "scene_location": "INT. Studio - High Speed Macro Rig",
         "framing_and_lens": "Macro 100mm f/2.8",
         "camera_movement": "Static (1000fps)",
-        "visual_action": "A hand slams the matte black Solstice can onto a block of clear ice, shattering it into a spray of crystal shards. On-screen text: 'STOP DRINKING WATERED-DOWN COFFEE'",
-        "audio_vo": "Loud, hyper-crisp ice-shattering crack layered with a deep, vibrating sub-bass drop."
+        "visual_action": "Extreme macro pull shot of a can tab popping, releasing an explosive plume of pressurized cold nitrogen mist directly into the camera lens. On-screen text: 'THIS ISN'T NORMAL COFFEE \u26a1'",
+        "audio_vo": "Hyper-crisp metallic snap followed by a loud, pressurized nitrogen blast and heavy bass drop."
       },
       {
         "shot_number": 2,
-        "scene_location": "INT. Studio - High Speed Rig",
-        "framing_and_lens": "MCU 50mm f/1.4",
-        "camera_movement": "Static",
-        "visual_action": "The tab is pulled, releasing a violent, pressurized plume of nitrogen mist spraying directly at the camera lens.",
-        "audio_vo": "Sharp, crisp metallic snap and pressurized hiss."
+        "scene_location": "INT. Studio - Macro Table",
+        "framing_and_lens": "Macro 100mm f/2.8",
+        "camera_movement": "Static (1000fps)",
+        "visual_action": "A hand slams the matte black Solstice can onto a block of clear ice, shattering it into a spray of crystal shards. On-screen text: 'NO WATER. NO SUGAR. PURE NITRO.'",
+        "audio_vo": "Loud, hyper-crisp ice-shattering crack layered with deep sub-bass vibration."
       },
       {
         "shot_number": 3,
         "scene_location": "INT. Studio - Liquid Tank",
         "framing_and_lens": "Macro 100mm f/2.8",
         "camera_movement": "Slow pan",
-        "visual_action": "Nitro cold brew pouring into a glass, showing the cascading waterfall effect of micro-bubbles.",
-        "audio_vo": "Velvety, bubbling liquid sound design."
+        "visual_action": "Nitro cold brew pouring into a glass, showing the cascading waterfall effect of micro-bubbles forming a thick velvet head. On-screen text: 'VELVET SMOOTH ENERGY'",
+        "audio_vo": "Velvety, bubbling liquid sound design with deep, smooth ambient synth."
       },
       {
         "shot_number": 4,
         "scene_location": "INT. Studio - Product Hero",
         "framing_and_lens": "Wide 35mm f/2.0",
         "camera_movement": "Orbit",
-        "visual_action": "The can sits on a dark slate surface, light catching the logo. On-screen text: 'CLAIM YOUR FREE TRIAL 4-PACK | TAP BELOW BEFORE STOCK RUNS OUT'",
-        "audio_vo": "Voiceover: Solstice Nitro. The dark side of energy."
+        "visual_action": "The can sits on a dark slate surface, dramatic light catching the metallic logo. High-contrast endcard overlay appears. On-screen text: 'CLAIM YOUR FREE 4-PACK NOW \u2014 TAP BELOW BEFORE STOCK RUNS OUT \u26a1'",
+        "audio_vo": "Voiceover: 'Solstice Nitro. Experience the dark side of energy. Tap below to claim your free 4-pack now.'"
       }
     ],
     "budget_breakdown": [
       {
         "category": "Pre-Production",
-        "line_item": "Creative direction, storyboarding, and scheduling",
+        "line_item": "Creative direction, storyboarding, and hook optimization analysis",
         "estimated_cost_usd": 2000.0
       },
       {
         "category": "Crew",
-        "line_item": "Director, DP, Gaffer, and Food Stylist",
+        "line_item": "Director, DP, Gaffer, and Food/Beverage Stylist",
         "estimated_cost_usd": 6000.0
       },
       {
         "category": "Equipment",
-        "line_item": "High-speed camera rental (Phantom VEO) and lighting package",
+        "line_item": "High-speed camera rental (Phantom VEO) and specialty macro lighting package",
         "estimated_cost_usd": 3500.0
       },
       {
         "category": "Post-Production",
-        "line_item": "Editing, color grading, and sound design",
+        "line_item": "Editing, high-retention text animation, color grading, and tactile sound design",
         "estimated_cost_usd": 2500.0
       },
       {
         "category": "AI Rendering",
-        "line_item": "Generative assets and AI-assisted texture enhancement",
+        "line_item": "Generative visual asset previs and texture enhancement",
         "estimated_cost_usd": 500.0
       }
     ],

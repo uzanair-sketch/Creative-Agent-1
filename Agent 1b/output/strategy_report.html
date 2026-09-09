@@ -1,309 +1,14 @@
-import os
-import json
-import time
-import warnings
-
-# Suppress minor platform deprecation/SSL warnings for clean output
-warnings.filterwarnings("ignore")
-
-from typing import List, Optional
-from pydantic import BaseModel, Field
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
-from google.genai.errors import ServerError
-
-# Automatically load environment variables from .env
-load_dotenv()
-
-# ---------------------------------------------------------------------------
-# 1. Pydantic Schemas for Strategy & Optimization
-# ---------------------------------------------------------------------------
-
-class Shot(BaseModel):
-    shot_number: int
-    scene_location: str
-    framing_and_lens: str
-    camera_movement: str
-    visual_action: str
-    audio_vo: str
-
-class BudgetItem(BaseModel):
-    category: str
-    line_item: str
-    estimated_cost_usd: float
-
-class BriefAnalysis(BaseModel):
-    client_name: str
-    core_objective: str
-    target_audience: str
-    deliverables: List[str]
-    aesthetic_tone: str
-    estimated_budget_tier: str
-
-class VisualTreatment(BaseModel):
-    treatment_title: str
-    logline: str
-    visual_direction: str
-    color_palette: List[str]
-    ai_previs_prompts: List[str]
-
-class HookOption(BaseModel):
-    hook_type: str = Field(description="Pattern Interrupt, Curiosity Gap, or Sensory Shock")
-    visual_hook_description: str = Field(description="First 0-3s visual action")
-    on_screen_text: str = Field(description="High-contrast bold caption overlay for TikTok/Reels")
-    audio_hook: str = Field(description="First 3 seconds sound effect or dialogue line")
-    retention_rationale: str = Field(description="Why this prevents scrolling based on market trends")
-
-class CompetitorInsight(BaseModel):
-    competitor_name: str = Field(description="Direct or indirect competitor brand")
-    winning_creative_pattern: str = Field(description="What works in their current ad creatives")
-    creative_opportunity_gap: str = Field(description="How our campaign will visually outperform them")
-
-class CompleteProductionTreatment(BaseModel):
-    brief_analysis: BriefAnalysis
-    treatment: VisualTreatment
-    shot_list: List[Shot]
-    budget_breakdown: List[BudgetItem]
-    total_estimated_budget_usd: float
-
-class StrategyOptimizationPackage(BaseModel):
-    competitor_insights: List[CompetitorInsight]
-    high_retention_hooks: List[HookOption]
-    selected_primary_hook: HookOption
-    optimized_cta: str = Field(description="High-converting end screen Call to Action")
-    enriched_treatment: CompleteProductionTreatment
-
-# ---------------------------------------------------------------------------
-# 2. Agent 1b Implementation
-# ---------------------------------------------------------------------------
-
-class CompetitorStrategyAgent:
-    def __init__(self, fallback_models: Optional[List[str]] = None):
-        self.client = genai.Client()
-        self.fallback_models = fallback_models or [
-            "gemini-3.6-flash",
-            "gemini-3.5-flash",
-            "gemini-3.1-flash-lite",
-            "gemini-3.8-flash"
-        ]
-
-    def _resolve_path(self, path: str) -> str:
-        """Finds input file across common relative locations if not found at exact path."""
-        if os.path.exists(path):
-            return path
-
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        candidates = [
-            os.path.join(script_dir, path),
-            os.path.join(script_dir, "..", "Agent 1a", path),
-            os.path.join(script_dir, "..", path),
-            os.path.join(script_dir, "..", "..", path),
-            os.path.join(script_dir, "..", "..", "Agent 1", "Agent 1a", path),
-            os.path.join(os.getcwd(), "Agent 1", "Agent 1a", path),
-            os.path.join(os.getcwd(), path),
-        ]
-        for candidate in candidates:
-            if os.path.exists(candidate):
-                return os.path.abspath(candidate)
-        return path
-
-    def run(self, input_treatment_path: str) -> StrategyOptimizationPackage:
-        """Reads previous treatment JSON, performs competitor analysis, and optimizes state."""
-        resolved_path = self._resolve_path(input_treatment_path)
-        if not os.path.exists(resolved_path):
-            raise FileNotFoundError(
-                f"Input file not found: {input_treatment_path} (checked {resolved_path}). Run Agent 1a first!"
-            )
-
-        with open(resolved_path, "r") as f:
-            previous_treatment_data = json.load(f)
-
-        print(f"📥 [Agent 1b] Loaded Agent 1a Treatment from: {resolved_path}")
-        print("🔍 [Agent 1b] Analyzing competitor landscape & optimizing high-retention hooks...")
-
-        system_instruction = """
-        You are a Lead Creative Strategist and Performance Ad Director specializing in social video (TikTok, Instagram Reels, YouTube Shorts).
-        Your task is to take an existing commercial treatment, analyze top competitor ad patterns in its category, 
-        and optimize the opening 3-second hooks and ending Call-To-Action (CTA) for maximum scroll-stopping retention.
-
-        Enforce strict visual hooks, pattern interrupts, tactile sound design, and sharp on-screen text overlays.
-        Return the fully enriched treatment with the optimized shot list and strategy analysis.
-        """
-
-        prompt = f"""
-        Perform a competitive creative analysis and hook optimization for the following production treatment:
-
-        === EXISTING TREATMENT JSON ===
-        {json.dumps(previous_treatment_data, indent=2)}
-        ===============================
-        """
-
-        # Model Fallback Execution Loop with Exponential Backoff
-        last_exception = None
-        for model_name in self.fallback_models:
-            for attempt in range(1, 3):
-                try:
-                    attempt_str = f" (attempt {attempt}/2)" if attempt > 1 else ""
-                    print(f"🚀 Attempting optimization with model: {model_name}{attempt_str}...", flush=True)
-                    response = self.client.models.generate_content(
-                        model=model_name,
-                        contents=prompt,
-                        config=types.GenerateContentConfig(
-                            system_instruction=system_instruction,
-                            temperature=0.3,
-                            response_mime_type="application/json",
-                            response_schema=StrategyOptimizationPackage,
-                        ),
-                    )
-
-                    if hasattr(response, "parsed") and isinstance(response.parsed, StrategyOptimizationPackage):
-                        return response.parsed
-
-                    result_json = json.loads(response.text)
-                    return StrategyOptimizationPackage(**result_json)
-
-                except ServerError as e:
-                    print(f"⚠️ Model {model_name} hit server load error (503). Waiting 2s before retry...", flush=True)
-                    last_exception = e
-                    time.sleep(2)
-                except Exception as e:
-                    print(f"⚠️ Error with model {model_name}: {e}. Retrying next model...", flush=True)
-                    last_exception = e
-                    break
-
-        raise RuntimeError(f"All candidate models failed. Last error: {last_exception}")
-
-# ---------------------------------------------------------------------------
-# 3. Execution & Workspace Artifact Updater
-# ---------------------------------------------------------------------------
-
-def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
-    """Generates an executive, interactive dark-mode HTML review document."""
-    brief = pkg.enriched_treatment.brief_analysis
-    treatment = pkg.enriched_treatment.treatment
-    shots = pkg.enriched_treatment.shot_list
-    budget = pkg.enriched_treatment.budget_breakdown
-    total_budget = pkg.enriched_treatment.total_estimated_budget_usd
-
-    # Color palette swatches
-    palette_html = "".join([
-        f'''<div class="color-swatch" onclick="navigator.clipboard.writeText('{c}'); showToast('Copied {c}')" title="Click to copy hex">
-            <div class="swatch-preview" style="background-color: {c};"></div>
-            <span class="swatch-hex">{c}</span>
-        </div>'''
-        for c in treatment.color_palette
-    ])
-
-    # Competitor insights
-    competitors_html = "".join([
-        f'''<div class="intel-card">
-            <div class="intel-header">
-                <span class="comp-badge">Competitor Brand</span>
-                <h3>{c.competitor_name}</h3>
-            </div>
-            <div class="intel-section">
-                <div class="intel-sublabel">Winning Creative Pattern</div>
-                <p>{c.winning_creative_pattern}</p>
-            </div>
-            <div class="intel-section opportunity">
-                <div class="intel-sublabel highlight">Our Strategic Opportunity Gap</div>
-                <p>{c.creative_opportunity_gap}</p>
-            </div>
-        </div>'''
-        for c in pkg.competitor_insights
-    ])
-
-    # Hooks
-    hooks_html = "".join([
-        f'''<div class="hook-card {'primary' if h.hook_type == pkg.selected_primary_hook.hook_type else ''}">
-            <div class="hook-card-header">
-                <span class="hook-type-badge {h.hook_type.lower().replace(' ', '-')}">{h.hook_type}</span>
-                {'<span class="primary-crown">👑 Selected Primary Hook</span>' if h.hook_type == pkg.selected_primary_hook.hook_type else '<span class="alt-badge">Alternative Hook</span>'}
-            </div>
-            
-            <div class="social-preview-mockup">
-                <div class="mockup-top">
-                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
-                    <span class="mockup-timer">0:00 - 0:03 Hook Window</span>
-                </div>
-                <div class="mockup-viewport">
-                    <div class="mockup-overlay-pill">"{h.on_screen_text}"</div>
-                </div>
-            </div>
-
-            <div class="hook-meta">
-                <div class="meta-block">
-                    <span class="meta-label">👁️ Visual Interrupt (0-3s)</span>
-                    <p>{h.visual_hook_description}</p>
-                </div>
-                <div class="meta-block audio">
-                    <span class="meta-label">🔊 Tactile Sound Design / Dialogue</span>
-                    <p>{h.audio_hook}</p>
-                </div>
-                <div class="meta-block rationale">
-                    <span class="meta-label">📈 Scroll-Stopping Retention Rationale</span>
-                    <p>{h.retention_rationale}</p>
-                </div>
-            </div>
-        </div>'''
-        for h in pkg.high_retention_hooks
-    ])
-
-    # Shot list
-    shots_html = "".join([
-        f'''<tr class="shot-row">
-            <td class="col-num"><span class="shot-pill">#{s.shot_number}</span></td>
-            <td class="col-loc"><span class="loc-pill">{s.scene_location}</span></td>
-            <td class="col-cam">
-                <div class="cam-lens">{s.framing_and_lens}</div>
-                <div class="cam-move">🎥 {s.camera_movement}</div>
-            </td>
-            <td class="col-act">{s.visual_action}</td>
-            <td class="col-audio"><div class="audio-vo">🎙️ {s.audio_vo}</div></td>
-        </tr>'''
-        for s in shots
-    ])
-
-    # Pre-vis prompts
-    prompts_html = "".join([
-        f'''<div class="prompt-card">
-            <div class="prompt-header">
-                <span class="prompt-idx">AI Pre-Vis Prompt {idx+1}</span>
-                <button class="btn-copy" onclick="copyPrompt(this)">Copy Prompt</button>
-            </div>
-            <pre class="prompt-text"><code>{p}</code></pre>
-        </div>'''
-        for idx, p in enumerate(treatment.ai_previs_prompts)
-    ])
-
-    # Budget rows
-    budget_html = "".join([
-        f'''<tr>
-            <td><span class="budget-cat-pill">{b.category}</span></td>
-            <td class="budget-item">{b.line_item}</td>
-            <td class="budget-cost">${b.estimated_cost_usd:,.2f}</td>
-        </tr>'''
-        for b in budget
-    ])
-
-    # Deliverables tags
-    deliverables_html = "".join([
-        f'''<span class="tag-pill deliverable">{d}</span>'''
-        for d in brief.deliverables
-    ])
-
-    html = f'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{brief.client_name} — Commercial Treatment & Strategy Review</title>
+    <title>Solstice Coffee Co. — Commercial Treatment & Strategy Review</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root {{
+        :root {
             --bg-base: #090d16;
             --bg-surface: #101626;
             --bg-card: rgba(22, 30, 48, 0.7);
@@ -321,25 +26,25 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --font-display: 'Outfit', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
-        }}
+        }
 
-        * {{
+        * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-        }}
+        }
 
-        body {{
+        body {
             background-color: var(--bg-base);
             color: var(--text-primary);
             font-family: var(--font-sans);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             padding-bottom: 80px;
-        }}
+        }
 
         /* Subtle background mesh gradient */
-        body::before {{
+        body::before {
             content: '';
             position: fixed;
             top: 0;
@@ -350,33 +55,33 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
                         radial-gradient(circle at 90% 200px, rgba(6, 182, 212, 0.08), transparent 50%);
             pointer-events: none;
             z-index: 0;
-        }}
+        }
 
-        .wrapper {{
+        .wrapper {
             position: relative;
             z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
             padding: 32px 24px;
-        }}
+        }
 
         /* Header Navigation & Actions */
-        header {{
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding-bottom: 24px;
             border-bottom: 1px solid var(--border-subtle);
             margin-bottom: 36px;
-        }}
+        }
 
-        .brand-badge-group {{
+        .brand-badge-group {
             display: flex;
             align-items: center;
             gap: 12px;
-        }}
+        }
 
-        .pipeline-pill {{
+        .pipeline-pill {
             background: rgba(245, 158, 11, 0.15);
             color: var(--accent-gold);
             font-family: var(--font-mono);
@@ -387,9 +92,9 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             border: 1px solid rgba(245, 158, 11, 0.3);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
 
-        .status-pill {{
+        .status-pill {
             background: rgba(16, 185, 129, 0.12);
             color: var(--accent-emerald);
             font-size: 12px;
@@ -399,22 +104,22 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             display: inline-flex;
             align-items: center;
             gap: 6px;
-        }}
-        .status-pill::before {{
+        }
+        .status-pill::before {
             content: '';
             width: 6px;
             height: 6px;
             border-radius: 50%;
             background-color: var(--accent-emerald);
             box-shadow: 0 0 8px var(--accent-emerald);
-        }}
+        }
 
-        .header-actions {{
+        .header-actions {
             display: flex;
             gap: 12px;
-        }}
+        }
 
-        .btn {{
+        .btn {
             font-family: var(--font-sans);
             font-size: 13px;
             font-weight: 600;
@@ -428,25 +133,25 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             display: inline-flex;
             align-items: center;
             gap: 8px;
-        }}
-        .btn:hover {{
+        }
+        .btn:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.2);
             transform: translateY(-1px);
-        }}
-        .btn-primary {{
+        }
+        .btn-primary {
             background: linear-gradient(135deg, #d97706, #f59e0b);
             color: #000;
             border: none;
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
-        }}
-        .btn-primary:hover {{
+        }
+        .btn-primary:hover {
             background: linear-gradient(135deg, #b45309, #d97706);
             color: #fff;
-        }}
+        }
 
         /* Hero Spotlight Section */
-        .hero-banner {{
+        .hero-banner {
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: 16px;
@@ -455,8 +160,8 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
             position: relative;
             overflow: hidden;
-        }}
-        .hero-banner::after {{
+        }
+        .hero-banner::after {
             content: '';
             position: absolute;
             top: 0;
@@ -465,9 +170,9 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             height: 100%;
             background: radial-gradient(circle at 100% 50%, rgba(245, 158, 11, 0.08), transparent 70%);
             pointer-events: none;
-        }}
+        }
 
-        .hero-title-group h1 {{
+        .hero-title-group h1 {
             font-family: var(--font-display);
             font-size: 38px;
             font-weight: 800;
@@ -475,17 +180,17 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             line-height: 1.2;
             color: #fff;
             margin-bottom: 8px;
-        }}
-        .client-subhead {{
+        }
+        .client-subhead {
             font-size: 16px;
             color: var(--accent-gold);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 20px;
-        }}
+        }
 
-        .logline-quote {{
+        .logline-quote {
             font-size: 18px;
             font-weight: 400;
             font-style: italic;
@@ -495,37 +200,37 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             border-left: 4px solid var(--accent-gold);
             border-radius: 0 8px 8px 0;
             margin-bottom: 28px;
-        }}
+        }
 
-        .meta-grid {{
+        .meta-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid var(--border-subtle);
-        }}
-        .meta-card {{
+        }
+        .meta-card {
             background: rgba(0, 0, 0, 0.2);
             padding: 14px 18px;
             border-radius: 10px;
             border: 1px solid var(--border-subtle);
-        }}
-        .meta-card .label {{
+        }
+        .meta-card .label {
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             color: var(--text-muted);
             letter-spacing: 0.5px;
             margin-bottom: 4px;
-        }}
-        .meta-card .value {{
+        }
+        .meta-card .value {
             font-size: 14px;
             font-weight: 500;
             color: var(--text-primary);
-        }}
+        }
 
-        .tag-pill {{
+        .tag-pill {
             display: inline-block;
             font-size: 12px;
             font-weight: 500;
@@ -535,16 +240,16 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             margin-bottom: 6px;
             background: rgba(255, 255, 255, 0.08);
             color: #e2e8f0;
-        }}
+        }
 
         /* Color Palette */
-        .palette-wrap {{
+        .palette-wrap {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
             margin-top: 12px;
-        }}
-        .color-swatch {{
+        }
+        .color-swatch {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -554,33 +259,33 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             border: 1px solid var(--border-subtle);
             cursor: pointer;
             transition: all 0.2s;
-        }}
-        .color-swatch:hover {{
+        }
+        .color-swatch:hover {
             border-color: var(--accent-gold);
             transform: translateY(-2px);
-        }}
-        .swatch-preview {{
+        }
+        .swatch-preview {
             width: 20px;
             height: 20px;
             border-radius: 4px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-        }}
-        .swatch-hex {{
+        }
+        .swatch-hex {
             font-family: var(--font-mono);
             font-size: 12px;
             color: var(--text-secondary);
-        }}
+        }
 
         /* Section Headings */
-        .section-header {{
+        .section-header {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
             margin: 48px 0 24px 0;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--border-subtle);
-        }}
-        .section-title {{
+        }
+        .section-title {
             font-family: var(--font-display);
             font-size: 24px;
             font-weight: 700;
@@ -588,36 +293,36 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             display: flex;
             align-items: center;
             gap: 10px;
-        }}
-        .section-desc {{
+        }
+        .section-desc {
             font-size: 13px;
             color: var(--text-muted);
-        }}
+        }
 
         /* Competitor Intelligence Cards */
-        .competitor-grid {{
+        .competitor-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
-        }}
-        .intel-card {{
+        }
+        .intel-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
             padding: 24px;
             backdrop-filter: blur(12px);
             transition: all 0.2s ease;
-        }}
-        .intel-card:hover {{
+        }
+        .intel-card:hover {
             background: var(--bg-card-hover);
             border-color: rgba(255, 255, 255, 0.15);
             transform: translateY(-3px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }}
-        .intel-header {{
+        }
+        .intel-header {
             margin-bottom: 16px;
-        }}
-        .comp-badge {{
+        }
+        .comp-badge {
             font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
@@ -628,48 +333,48 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             border-radius: 4px;
             display: inline-block;
             margin-bottom: 6px;
-        }}
-        .intel-header h3 {{
+        }
+        .intel-header h3 {
             font-family: var(--font-display);
             font-size: 20px;
             font-weight: 700;
             color: #fff;
-        }}
-        .intel-section {{
+        }
+        .intel-section {
             margin-bottom: 14px;
-        }}
-        .intel-sublabel {{
+        }
+        .intel-sublabel {
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--text-muted);
             margin-bottom: 4px;
-        }}
-        .intel-sublabel.highlight {{
+        }
+        .intel-sublabel.highlight {
             color: var(--accent-gold);
-        }}
-        .intel-section.opportunity {{
+        }
+        .intel-section.opportunity {
             background: rgba(245, 158, 11, 0.08);
             border: 1px solid rgba(245, 158, 11, 0.2);
             padding: 12px;
             border-radius: 8px;
             margin-top: 16px;
             margin-bottom: 0;
-        }}
-        .intel-section p {{
+        }
+        .intel-section p {
             font-size: 13.5px;
             color: #cbd5e1;
             line-height: 1.5;
-        }}
+        }
 
         /* High-Retention Hook Lab */
-        .hook-grid {{
+        .hook-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 24px;
-        }}
-        .hook-card {{
+        }
+        .hook-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             border-radius: 14px;
@@ -678,22 +383,22 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             flex-direction: column;
             position: relative;
             transition: all 0.3s ease;
-        }}
-        .hook-card.primary {{
+        }
+        .hook-card.primary {
             border-color: var(--accent-gold);
             box-shadow: 0 0 24px rgba(245, 158, 11, 0.18), inset 0 0 12px rgba(245, 158, 11, 0.05);
             background: linear-gradient(180deg, rgba(30, 41, 66, 0.8) 0%, rgba(22, 30, 48, 0.9) 100%);
-        }}
-        .hook-card:hover {{
+        }
+        .hook-card:hover {
             transform: translateY(-4px);
-        }}
-        .hook-card-header {{
+        }
+        .hook-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
-        }}
-        .hook-type-badge {{
+        }
+        .hook-type-badge {
             font-family: var(--font-display);
             font-size: 13px;
             font-weight: 700;
@@ -701,23 +406,23 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             letter-spacing: 0.5px;
             padding: 4px 12px;
             border-radius: 999px;
-        }}
-        .hook-type-badge.pattern-interrupt {{
+        }
+        .hook-type-badge.pattern-interrupt {
             background: rgba(244, 63, 94, 0.15);
             color: var(--accent-rose);
             border: 1px solid rgba(244, 63, 94, 0.3);
-        }}
-        .hook-type-badge.sensory-shock {{
+        }
+        .hook-type-badge.sensory-shock {
             background: rgba(245, 158, 11, 0.15);
             color: var(--accent-gold);
             border: 1px solid rgba(245, 158, 11, 0.3);
-        }}
-        .hook-type-badge.curiosity-gap {{
+        }
+        .hook-type-badge.curiosity-gap {
             background: rgba(6, 182, 212, 0.15);
             color: var(--accent-cyan);
             border: 1px solid rgba(6, 182, 212, 0.3);
-        }}
-        .primary-crown {{
+        }
+        .primary-crown {
             font-size: 11px;
             font-weight: 700;
             color: var(--accent-gold);
@@ -725,44 +430,44 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             padding: 3px 8px;
             border-radius: 6px;
             border: 1px solid rgba(245, 158, 11, 0.3);
-        }}
-        .alt-badge {{
+        }
+        .alt-badge {
             font-size: 11px;
             color: var(--text-muted);
-        }}
+        }
 
         /* Social Reel Mockup Box */
-        .social-preview-mockup {{
+        .social-preview-mockup {
             background: #030712;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             margin-bottom: 20px;
             overflow: hidden;
-        }}
-        .mockup-top {{
+        }
+        .mockup-top {
             background: #111827;
             padding: 6px 10px;
             display: flex;
             align-items: center;
             gap: 6px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }}
-        .dot {{
+        }
+        .dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
             display: inline-block;
-        }}
-        .dot.red {{ background: #ef4444; }}
-        .dot.yellow {{ background: #eab308; }}
-        .dot.green {{ background: #22c55e; }}
-        .mockup-timer {{
+        }
+        .dot.red { background: #ef4444; }
+        .dot.yellow { background: #eab308; }
+        .dot.green { background: #22c55e; }
+        .mockup-timer {
             font-family: var(--font-mono);
             font-size: 10px;
             color: var(--text-muted);
             margin-left: auto;
-        }}
-        .mockup-viewport {{
+        }
+        .mockup-viewport {
             height: 120px;
             display: flex;
             align-items: center;
@@ -770,8 +475,8 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             background: radial-gradient(circle at 50% 50%, #1e293b, #090d16);
             padding: 16px;
             position: relative;
-        }}
-        .mockup-overlay-pill {{
+        }
+        .mockup-overlay-pill {
             background: rgba(0, 0, 0, 0.85);
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -784,27 +489,27 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             letter-spacing: 0.5px;
             text-transform: uppercase;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-        }}
+        }
 
-        .hook-meta {{
+        .hook-meta {
             display: flex;
             flex-direction: column;
             gap: 14px;
             flex-grow: 1;
-        }}
-        .meta-block {{
+        }
+        .meta-block {
             background: rgba(0, 0, 0, 0.2);
             padding: 12px;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.04);
-        }}
-        .meta-block.audio {{
+        }
+        .meta-block.audio {
             border-left: 3px solid var(--accent-cyan);
-        }}
-        .meta-block.rationale {{
+        }
+        .meta-block.rationale {
             border-left: 3px solid var(--accent-emerald);
-        }}
-        .meta-label {{
+        }
+        .meta-label {
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
@@ -812,15 +517,15 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             color: var(--text-muted);
             display: block;
             margin-bottom: 4px;
-        }}
-        .meta-block p {{
+        }
+        .meta-block p {
             font-size: 13px;
             color: #cbd5e1;
             line-height: 1.45;
-        }}
+        }
 
         /* CTA End Screen Showcase */
-        .cta-banner {{
+        .cta-banner {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%);
             border: 1px solid var(--accent-gold);
             border-radius: 14px;
@@ -831,26 +536,26 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             justify-content: space-between;
             gap: 24px;
             flex-wrap: wrap;
-        }}
-        .cta-content {{
+        }
+        .cta-content {
             max-width: 680px;
-        }}
-        .cta-sub {{
+        }
+        .cta-sub {
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--accent-gold);
             margin-bottom: 6px;
-        }}
-        .cta-headline {{
+        }
+        .cta-headline {
             font-family: var(--font-display);
             font-size: 22px;
             font-weight: 800;
             color: #fff;
             letter-spacing: -0.3px;
-        }}
-        .cta-button-preview {{
+        }
+        .cta-button-preview {
             background: var(--accent-gold);
             color: #000;
             font-family: var(--font-display);
@@ -862,101 +567,101 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             letter-spacing: 0.5px;
             box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
             white-space: nowrap;
-        }}
+        }
 
         /* Production Shot List Table */
-        .table-card {{
+        .table-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
             overflow: hidden;
             backdrop-filter: blur(12px);
             margin-bottom: 36px;
-        }}
-        table {{
+        }
+        table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-        }}
-        thead {{
+        }
+        thead {
             background: rgba(0, 0, 0, 0.4);
             border-bottom: 1px solid var(--border-subtle);
-        }}
-        th {{
+        }
+        th {
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             color: var(--text-muted);
             padding: 14px 18px;
-        }}
-        td {{
+        }
+        td {
             padding: 16px 18px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             font-size: 13.5px;
             vertical-align: top;
-        }}
-        tr:last-child td {{
+        }
+        tr:last-child td {
             border-bottom: none;
-        }}
-        tr:hover td {{
+        }
+        tr:hover td {
             background: rgba(255, 255, 255, 0.02);
-        }}
-        .shot-pill {{
+        }
+        .shot-pill {
             background: rgba(245, 158, 11, 0.15);
             color: var(--accent-gold);
             font-family: var(--font-mono);
             font-weight: 700;
             padding: 3px 8px;
             border-radius: 4px;
-        }}
-        .loc-pill {{
+        }
+        .loc-pill {
             background: rgba(255, 255, 255, 0.08);
             color: #cbd5e1;
             font-size: 12px;
             padding: 3px 8px;
             border-radius: 4px;
-        }}
-        .cam-lens {{
+        }
+        .cam-lens {
             font-weight: 600;
             color: #fff;
-        }}
-        .cam-move {{
+        }
+        .cam-move {
             font-size: 12px;
             color: var(--text-muted);
             margin-top: 4px;
-        }}
-        .audio-vo {{
+        }
+        .audio-vo {
             font-style: italic;
             color: #94a3b8;
-        }}
+        }
 
         /* AI Pre-Vis Prompts */
-        .prompts-container {{
+        .prompts-container {
             display: grid;
             gap: 16px;
             margin-bottom: 36px;
-        }}
-        .prompt-card {{
+        }
+        .prompt-card {
             background: #030712;
             border: 1px solid var(--border-subtle);
             border-radius: 10px;
             padding: 16px 20px;
-        }}
-        .prompt-header {{
+        }
+        .prompt-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-        }}
-        .prompt-idx {{
+        }
+        .prompt-idx {
             font-size: 11px;
             font-weight: 700;
             color: var(--accent-cyan);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
-        .btn-copy {{
+        }
+        .btn-copy {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--text-secondary);
@@ -965,49 +670,49 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
-        }}
-        .btn-copy:hover {{
+        }
+        .btn-copy:hover {
             background: var(--accent-cyan);
             color: #000;
-        }}
-        .prompt-text {{
+        }
+        .prompt-text {
             font-family: var(--font-mono);
             font-size: 12.5px;
             color: #e2e8f0;
             white-space: pre-wrap;
             word-break: break-word;
             line-height: 1.5;
-        }}
+        }
 
         /* Budget Summary */
-        .budget-cat-pill {{
+        .budget-cat-pill {
             background: rgba(6, 182, 212, 0.12);
             color: var(--accent-cyan);
             font-size: 11px;
             font-weight: 600;
             padding: 2px 8px;
             border-radius: 4px;
-        }}
-        .budget-cost {{
+        }
+        .budget-cost {
             font-family: var(--font-mono);
             font-weight: 600;
             color: #fff;
             text-align: right;
-        }}
-        .total-row td {{
+        }
+        .total-row td {
             background: rgba(245, 158, 11, 0.08);
             font-size: 15px;
             font-weight: 700;
             border-top: 2px solid var(--accent-gold);
             color: #fff;
-        }}
-        .total-row .budget-cost {{
+        }
+        .total-row .budget-cost {
             color: var(--accent-gold);
             font-size: 18px;
-        }}
+        }
 
         /* Toast notification */
-        #toast {{
+        #toast {
             visibility: hidden;
             min-width: 220px;
             background-color: #0f172a;
@@ -1025,27 +730,27 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             font-size: 13px;
             opacity: 0;
             transition: opacity 0.3s, visibility 0.3s;
-        }}
-        #toast.show {{
+        }
+        #toast.show {
             visibility: visible;
             opacity: 1;
-        }}
+        }
 
-        @media print {{
-            body {{
+        @media print {
+            body {
                 background: #fff;
                 color: #000;
-            }}
-            .header-actions, #toast, .btn-copy {{
+            }
+            .header-actions, #toast, .btn-copy {
                 display: none !important;
-            }}
-            .hero-banner, .intel-card, .hook-card, .table-card {{
+            }
+            .hero-banner, .intel-card, .hook-card, .table-card {
                 background: #fff !important;
                 color: #000 !important;
                 border: 1px solid #ccc !important;
                 box-shadow: none !important;
-            }}
-        }}
+            }
+        }
     </style>
 </head>
 <body>
@@ -1064,41 +769,53 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
 
         <!-- Hero Treatment Overview -->
         <section class="hero-banner">
-            <div class="client-subhead">{brief.client_name} • Commercial Production</div>
+            <div class="client-subhead">Solstice Coffee Co. • Commercial Production</div>
             <div class="hero-title-group">
-                <h1>{treatment.treatment_title}</h1>
+                <h1>The Nitro Pulse</h1>
             </div>
             <div class="logline-quote">
-                "{treatment.logline}"
+                "A sensory journey into the velvet texture of Solstice Nitro, where darkness meets the sharp, refreshing snap of nitrogen-infused coffee."
             </div>
 
             <div class="meta-grid">
                 <div class="meta-card">
                     <div class="label">Core Objective</div>
-                    <div class="value">{brief.core_objective}</div>
+                    <div class="value">Launch a new nitro canned cold brew with a high-energy, premium cinematic spot optimized for viral retention.</div>
                 </div>
                 <div class="meta-card">
                     <div class="label">Target Audience</div>
-                    <div class="value">{brief.target_audience}</div>
+                    <div class="value">Urban young professionals and coffee enthusiasts aged 22-38.</div>
                 </div>
                 <div class="meta-card">
                     <div class="label">Aesthetic Tone</div>
-                    <div class="value">{brief.aesthetic_tone}</div>
+                    <div class="value">Dark, sleek, tactile, cinematic, high-contrast, moody, sophisticated.</div>
                 </div>
                 <div class="meta-card">
                     <div class="label">Budget Tier</div>
-                    <div class="value">{brief.estimated_budget_tier} (${total_budget:,.0f} est.)</div>
+                    <div class="value">Mid ($5k-$20k) ($14,500 est.)</div>
                 </div>
             </div>
 
             <div style="margin-top: 24px;">
                 <div class="label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Deliverables</div>
-                <div>{deliverables_html}</div>
+                <div><span class="tag-pill deliverable">1x 30s hero cut (16:9)</span><span class="tag-pill deliverable">2x 15s vertical social cuts (9:16)</span></div>
             </div>
 
             <div style="margin-top: 20px;">
                 <div class="label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Visual Palette (Click to Copy Hex)</div>
-                <div class="palette-wrap">{palette_html}</div>
+                <div class="palette-wrap"><div class="color-swatch" onclick="navigator.clipboard.writeText('#0A0A0A treatment_title'); showToast('Copied #0A0A0A treatment_title')" title="Click to copy hex">
+            <div class="swatch-preview" style="background-color: #0A0A0A treatment_title;"></div>
+            <span class="swatch-hex">#0A0A0A treatment_title</span>
+        </div><div class="color-swatch" onclick="navigator.clipboard.writeText(' #1A1A1A'); showToast('Copied  #1A1A1A')" title="Click to copy hex">
+            <div class="swatch-preview" style="background-color:  #1A1A1A;"></div>
+            <span class="swatch-hex"> #1A1A1A</span>
+        </div><div class="color-swatch" onclick="navigator.clipboard.writeText(' #4A3728'); showToast('Copied  #4A3728')" title="Click to copy hex">
+            <div class="swatch-preview" style="background-color:  #4A3728;"></div>
+            <span class="swatch-hex"> #4A3728</span>
+        </div><div class="color-swatch" onclick="navigator.clipboard.writeText(' #B8860B'); showToast('Copied  #B8860B')" title="Click to copy hex">
+            <div class="swatch-preview" style="background-color:  #B8860B;"></div>
+            <span class="swatch-hex"> #B8860B</span>
+        </div></div>
             </div>
         </section>
 
@@ -1110,14 +827,104 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             </div>
         </div>
         <div class="hook-grid">
-            {hooks_html}
+            <div class="hook-card ">
+            <div class="hook-card-header">
+                <span class="hook-type-badge pattern-interrupt">Pattern Interrupt</span>
+                <span class="alt-badge">Alternative Hook</span>
+            </div>
+            
+            <div class="social-preview-mockup">
+                <div class="mockup-top">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                    <span class="mockup-timer">0:00 - 0:03 Hook Window</span>
+                </div>
+                <div class="mockup-viewport">
+                    <div class="mockup-overlay-pill">"STOP DRINKING WATERED-DOWN COFFEE 🚫"</div>
+                </div>
+            </div>
+
+            <div class="hook-meta">
+                <div class="meta-block">
+                    <span class="meta-label">👁️ Visual Interrupt (0-3s)</span>
+                    <p>A hand slams a matte black Solstice can into a crystal ice block in 1000fps ultra slow-motion, sending sharp ice shards exploding into the frame.</p>
+                </div>
+                <div class="meta-block audio">
+                    <span class="meta-label">🔊 Tactile Sound Design / Dialogue</span>
+                    <p>Ear-splitting ice shatter impact synced with a heavy sub-bass drop.</p>
+                </div>
+                <div class="meta-block rationale">
+                    <span class="meta-label">📈 Scroll-Stopping Retention Rationale</span>
+                    <p>Violent kinetic movement and tactile destruction instantly shock the viewer, halting feed-scrolling within 0.5 seconds.</p>
+                </div>
+            </div>
+        </div><div class="hook-card primary">
+            <div class="hook-card-header">
+                <span class="hook-type-badge sensory-shock">Sensory Shock</span>
+                <span class="primary-crown">👑 Selected Primary Hook</span>
+            </div>
+            
+            <div class="social-preview-mockup">
+                <div class="mockup-top">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                    <span class="mockup-timer">0:00 - 0:03 Hook Window</span>
+                </div>
+                <div class="mockup-viewport">
+                    <div class="mockup-overlay-pill">"THIS ISN'T NORMAL COFFEE ⚡"</div>
+                </div>
+            </div>
+
+            <div class="hook-meta">
+                <div class="meta-block">
+                    <span class="meta-label">👁️ Visual Interrupt (0-3s)</span>
+                    <p>Extreme macro pull shot of a can tab popping, releasing an explosive plume of pressurized cold nitrogen mist directly into the lens.</p>
+                </div>
+                <div class="meta-block audio">
+                    <span class="meta-label">🔊 Tactile Sound Design / Dialogue</span>
+                    <p>Hyper-crisp metallic snap followed by a loud, pressurized nitrogen blast.</p>
+                </div>
+                <div class="meta-block rationale">
+                    <span class="meta-label">📈 Scroll-Stopping Retention Rationale</span>
+                    <p>Exploits ASMR sound design and macro depth-of-field to create an visceral reaction that hooks viewers.</p>
+                </div>
+            </div>
+        </div><div class="hook-card ">
+            <div class="hook-card-header">
+                <span class="hook-type-badge curiosity-gap">Curiosity Gap</span>
+                <span class="alt-badge">Alternative Hook</span>
+            </div>
+            
+            <div class="social-preview-mockup">
+                <div class="mockup-top">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                    <span class="mockup-timer">0:00 - 0:03 Hook Window</span>
+                </div>
+                <div class="mockup-viewport">
+                    <div class="mockup-overlay-pill">"WHY ARE BARISTAS ANGRY AT THIS CAN? 👀"</div>
+                </div>
+            </div>
+
+            <div class="hook-meta">
+                <div class="meta-block">
+                    <span class="meta-label">👁️ Visual Interrupt (0-3s)</span>
+                    <p>Reverse phantom-cam shot of velvety micro-bubbles rapidly cascading upwards, assembling into a dark coffee vortex inside a sleek glass.</p>
+                </div>
+                <div class="meta-block audio">
+                    <span class="meta-label">🔊 Tactile Sound Design / Dialogue</span>
+                    <p>Reversed audio vacuum swoosh snapping into instant silence.</p>
+                </div>
+                <div class="meta-block rationale">
+                    <span class="meta-label">📈 Scroll-Stopping Retention Rationale</span>
+                    <p>Piques curiosity through visual illusion and bold controversial hook text, driving watch time.</p>
+                </div>
+            </div>
+        </div>
         </div>
 
         <!-- High Converting CTA Banner -->
         <div class="cta-banner">
             <div class="cta-content">
                 <div class="cta-sub">High-Converting Call To Action</div>
-                <div class="cta-headline">"{pkg.optimized_cta}"</div>
+                <div class="cta-headline">"CLAIM YOUR FREE 4-PACK NOW — TAP BELOW BEFORE STOCK RUNS OUT ⚡"</div>
             </div>
             <div class="cta-button-preview">Tap To Unlock</div>
         </div>
@@ -1130,7 +937,46 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             </div>
         </div>
         <div class="competitor-grid">
-            {competitors_html}
+            <div class="intel-card">
+            <div class="intel-header">
+                <span class="comp-badge">Competitor Brand</span>
+                <h3>La Colombe (Draft Latte)</h3>
+            </div>
+            <div class="intel-section">
+                <div class="intel-sublabel">Winning Creative Pattern</div>
+                <p>Focuses heavily on smooth liquid pour visuals and latte art texture in bright, airy morning settings.</p>
+            </div>
+            <div class="intel-section opportunity">
+                <div class="intel-sublabel highlight">Our Strategic Opportunity Gap</div>
+                <p>Lacks high-energy dark-mode aesthetics and explosive tactile sound triggers that appeal to performance-focused professionals.</p>
+            </div>
+        </div><div class="intel-card">
+            <div class="intel-header">
+                <span class="comp-badge">Competitor Brand</span>
+                <h3>Rise Brewing Co.</h3>
+            </div>
+            <div class="intel-section">
+                <div class="intel-sublabel">Winning Creative Pattern</div>
+                <p>Uses casual UGC-style unboxing and quick-cut lifestyle montage videos.</p>
+            </div>
+            <div class="intel-section opportunity">
+                <div class="intel-sublabel highlight">Our Strategic Opportunity Gap</div>
+                <p>Misses premium cinematic high-speed studio cinematography that visually justifies a higher premium price point.</p>
+            </div>
+        </div><div class="intel-card">
+            <div class="intel-header">
+                <span class="comp-badge">Competitor Brand</span>
+                <h3>Chamberlain Coffee</h3>
+            </div>
+            <div class="intel-section">
+                <div class="intel-sublabel">Winning Creative Pattern</div>
+                <p>Relies on vibrant pastel packaging and influencer lifestyle integrations.</p>
+            </div>
+            <div class="intel-section opportunity">
+                <div class="intel-sublabel highlight">Our Strategic Opportunity Gap</div>
+                <p>Ignores sensory macro close-ups and high-contrast dark visual tones that stand out in feed scrolling.</p>
+            </div>
+        </div>
         </div>
 
         <!-- Enriched Production Shot List -->
@@ -1152,7 +998,43 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
                     </tr>
                 </thead>
                 <tbody>
-                    {shots_html}
+                    <tr class="shot-row">
+            <td class="col-num"><span class="shot-pill">#1</span></td>
+            <td class="col-loc"><span class="loc-pill">INT. Studio - High Speed Macro Rig</span></td>
+            <td class="col-cam">
+                <div class="cam-lens">Macro 100mm f/2.8</div>
+                <div class="cam-move">🎥 Static (1000fps)</div>
+            </td>
+            <td class="col-act">Extreme macro pull shot of a can tab popping, releasing an explosive plume of pressurized cold nitrogen mist directly into the camera lens. On-screen text: 'THIS ISN'T NORMAL COFFEE ⚡'</td>
+            <td class="col-audio"><div class="audio-vo">🎙️ Hyper-crisp metallic snap followed by a loud, pressurized nitrogen blast and heavy bass drop.</div></td>
+        </tr><tr class="shot-row">
+            <td class="col-num"><span class="shot-pill">#2</span></td>
+            <td class="col-loc"><span class="loc-pill">INT. Studio - Macro Table</span></td>
+            <td class="col-cam">
+                <div class="cam-lens">Macro 100mm f/2.8</div>
+                <div class="cam-move">🎥 Static (1000fps)</div>
+            </td>
+            <td class="col-act">A hand slams the matte black Solstice can onto a block of clear ice, shattering it into a spray of crystal shards. On-screen text: 'NO WATER. NO SUGAR. PURE NITRO.'</td>
+            <td class="col-audio"><div class="audio-vo">🎙️ Loud, hyper-crisp ice-shattering crack layered with deep sub-bass vibration.</div></td>
+        </tr><tr class="shot-row">
+            <td class="col-num"><span class="shot-pill">#3</span></td>
+            <td class="col-loc"><span class="loc-pill">INT. Studio - Liquid Tank</span></td>
+            <td class="col-cam">
+                <div class="cam-lens">Macro 100mm f/2.8</div>
+                <div class="cam-move">🎥 Slow pan</div>
+            </td>
+            <td class="col-act">Nitro cold brew pouring into a glass, showing the cascading waterfall effect of micro-bubbles forming a thick velvet head. On-screen text: 'VELVET SMOOTH ENERGY'</td>
+            <td class="col-audio"><div class="audio-vo">🎙️ Velvety, bubbling liquid sound design with deep, smooth ambient synth.</div></td>
+        </tr><tr class="shot-row">
+            <td class="col-num"><span class="shot-pill">#4</span></td>
+            <td class="col-loc"><span class="loc-pill">INT. Studio - Product Hero</span></td>
+            <td class="col-cam">
+                <div class="cam-lens">Wide 35mm f/2.0</div>
+                <div class="cam-move">🎥 Orbit</div>
+            </td>
+            <td class="col-act">The can sits on a dark slate surface, dramatic light catching the metallic logo. High-contrast endcard overlay appears. On-screen text: 'CLAIM YOUR FREE 4-PACK NOW — TAP BELOW BEFORE STOCK RUNS OUT ⚡'</td>
+            <td class="col-audio"><div class="audio-vo">🎙️ Voiceover: 'Solstice Nitro. Experience the dark side of energy. Tap below to claim your free 4-pack now.'</div></td>
+        </tr>
                 </tbody>
             </table>
         </div>
@@ -1165,7 +1047,19 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
             </div>
         </div>
         <div class="prompts-container">
-            {prompts_html}
+            <div class="prompt-card">
+            <div class="prompt-header">
+                <span class="prompt-idx">AI Pre-Vis Prompt 1</span>
+                <button class="btn-copy" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+            <pre class="prompt-text"><code>Macro shot of a matte black aluminum can, condensation droplets, dramatic rim lighting, dark moody studio background, 8k resolution, cinematic lighting, shot on Arri Alexa 35, 100mm macro lens --ar 16:9</code></pre>
+        </div><div class="prompt-card">
+            <div class="prompt-header">
+                <span class="prompt-idx">AI Pre-Vis Prompt 2</span>
+                <button class="btn-copy" onclick="copyPrompt(this)">Copy Prompt</button>
+            </div>
+            <pre class="prompt-text"><code>Extreme close up of nitro cold brew swirling in a glass, dark espresso liquid, cascading bubbles, high contrast, cinematic, sharp focus, volumetric lighting --ar 9:16</code></pre>
+        </div>
         </div>
 
         <!-- Production Budget Breakdown -->
@@ -1185,10 +1079,30 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
                     </tr>
                 </thead>
                 <tbody>
-                    {budget_html}
+                    <tr>
+            <td><span class="budget-cat-pill">Pre-Production</span></td>
+            <td class="budget-item">Creative direction, storyboarding, and hook optimization analysis</td>
+            <td class="budget-cost">$2,000.00</td>
+        </tr><tr>
+            <td><span class="budget-cat-pill">Crew</span></td>
+            <td class="budget-item">Director, DP, Gaffer, and Food/Beverage Stylist</td>
+            <td class="budget-cost">$6,000.00</td>
+        </tr><tr>
+            <td><span class="budget-cat-pill">Equipment</span></td>
+            <td class="budget-item">High-speed camera rental (Phantom VEO) and specialty macro lighting package</td>
+            <td class="budget-cost">$3,500.00</td>
+        </tr><tr>
+            <td><span class="budget-cat-pill">Post-Production</span></td>
+            <td class="budget-item">Editing, high-retention text animation, color grading, and tactile sound design</td>
+            <td class="budget-cost">$2,500.00</td>
+        </tr><tr>
+            <td><span class="budget-cat-pill">AI Rendering</span></td>
+            <td class="budget-item">Generative visual asset previs and texture enhancement</td>
+            <td class="budget-cost">$500.00</td>
+        </tr>
                     <tr class="total-row">
                         <td colspan="2">Total Estimated Production Budget</td>
-                        <td class="budget-cost">${total_budget:,.2f}</td>
+                        <td class="budget-cost">$14,500.00</td>
                     </tr>
                 </tbody>
             </table>
@@ -1198,127 +1112,28 @@ def generate_strategy_html(pkg: StrategyOptimizationPackage) -> str:
     <div id="toast">Copied to clipboard!</div>
 
     <script>
-        function showToast(msg) {{
+        function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
             toast.className = 'show';
-            setTimeout(() => {{ toast.className = toast.className.replace('show', ''); }}, 2500);
-        }}
+            setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 2500);
+        }
 
-        function copyPrompt(btn) {{
+        function copyPrompt(btn) {
             const code = btn.closest('.prompt-card').querySelector('code').innerText;
-            navigator.clipboard.writeText(code).then(() => {{
+            navigator.clipboard.writeText(code).then(() => {
                 const originalText = btn.innerText;
                 btn.innerText = 'Copied!';
                 btn.style.background = '#10b981';
                 btn.style.color = '#000';
                 showToast('AI Pre-Vis prompt copied!');
-                setTimeout(() => {{
+                setTimeout(() => {
                     btn.innerText = originalText;
                     btn.style.background = '';
                     btn.style.color = '';
-                }}, 2000);
-            }});
-        }}
+                }, 2000);
+            });
+        }
     </script>
 </body>
-</html>'''
-    return html
-
-# ---------------------------------------------------------------------------
-# 3. Execution & Workspace Artifact Updater
-# ---------------------------------------------------------------------------
-
-if __name__ == "__main__":
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    input_file = "output/treatment_output.json"
-
-    agent = CompetitorStrategyAgent()
-    strategy_package = agent.run(input_file)
-
-    # Determine destination directories
-    output_dirs = [
-        os.path.abspath("output"),
-        os.path.join(script_dir, "output"),
-    ]
-    # Deduplicate while preserving order
-    output_dirs = list(dict.fromkeys(output_dirs))
-
-    for out_dir in output_dirs:
-        os.makedirs(out_dir, exist_ok=True)
-
-        # 1. Update master treatment output JSON (enriches pipeline state for Agent 2)
-        output_json_path = os.path.join(out_dir, "treatment_output.json")
-        with open(output_json_path, "w") as f:
-            json.dump(strategy_package.enriched_treatment.model_dump(), f, indent=2)
-
-        # 2. Save full strategy report JSON
-        strategy_json_path = os.path.join(out_dir, "strategy_report.json")
-        with open(strategy_json_path, "w") as f:
-            json.dump(strategy_package.model_dump(), f, indent=2)
-
-        # 3. Save formatted Markdown Strategy Report for IDE Review
-        md_path = os.path.join(out_dir, "strategy_report.md")
-
-        hooks_md = "\n\n".join([
-            f"### Hook {idx+1}: {h.hook_type}\n"
-            f"- **Visual Interrupt:** {h.visual_hook_description}\n"
-            f"- **Text Overlay:** *\"{h.on_screen_text}\"*\n"
-            f"- **Audio Hook:** {h.audio_hook}\n"
-            f"- **Retention Rationale:** {h.retention_rationale}"
-            for idx, h in enumerate(strategy_package.high_retention_hooks)
-        ])
-
-        competitors_md = "\n".join([
-            f"| **{c.competitor_name}** | {c.winning_creative_pattern} | {c.creative_opportunity_gap} |"
-            for c in strategy_package.competitor_insights
-        ])
-
-        md_content = f"""# Strategy & Hook Optimization Report
-
-**Project:** {strategy_package.enriched_treatment.brief_analysis.client_name}  
-**Treatment Title:** {strategy_package.enriched_treatment.treatment.treatment_title}  
-**Optimized CTA:** *\"{strategy_package.optimized_cta}\"*  
-
----
-
-## 1. Competitive Ad Creative Analysis
-
-| Competitor | Winning Creative Pattern | Our Opportunity Gap |
-| :--- | :--- | :--- |
-{competitors_md}
-
----
-
-## 2. High-Retention Opening Hooks (0-3 Seconds)
-
-{hooks_md}
-
----
-
-## 3. Selected Primary Hook Strategy
-
-> **Type:** {strategy_package.selected_primary_hook.hook_type}  
-> **Visual:** {strategy_package.selected_primary_hook.visual_hook_description}  
-> **Text Overlay:** "{strategy_package.selected_primary_hook.on_screen_text}"  
-> **Audio:** {strategy_package.selected_primary_hook.audio_hook}  
-
----
-
-*State updated in `{output_json_path}`. Ready for **Agent 2: Pre-Vis Storyboard Generator**.*
-"""
-
-        with open(md_path, "w") as f:
-            f.write(md_content)
-
-        # 4. Save Interactive Dark-Mode HTML Review Document
-        html_path = os.path.join(out_dir, "strategy_report.html")
-        html_content = generate_strategy_html(strategy_package)
-        with open(html_path, "w") as f:
-            f.write(html_content)
-
-        print(f"\n✅ Artifacts written to {out_dir}:")
-        print(f" 📄 Enriched State:       {output_json_path}")
-        print(f" 📄 Strategy Report JSON: {strategy_json_path}")
-        print(f" 📄 Strategy Markdown:    {md_path}")
-        print(f" 🌐 Strategy HTML Review: {html_path}")
+</html>

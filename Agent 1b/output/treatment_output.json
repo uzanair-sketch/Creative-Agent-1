@@ -1,7 +1,7 @@
 {
   "brief_analysis": {
     "client_name": "Solstice Coffee Co.",
-    "core_objective": "Launch a new nitro canned cold brew with a high-energy, premium cinematic spot.",
+    "core_objective": "Launch a new nitro canned cold brew with a high-energy, premium cinematic spot optimized for viral retention.",
     "target_audience": "Urban young professionals and coffee enthusiasts aged 22-38.",
     "deliverables": [
       "1x 30s hero cut (16:9)",
@@ -28,61 +28,61 @@
   "shot_list": [
     {
       "shot_number": 1,
-      "scene_location": "INT. Studio - Macro Table",
+      "scene_location": "INT. Studio - High Speed Macro Rig",
       "framing_and_lens": "Macro 100mm f/2.8",
       "camera_movement": "Static (1000fps)",
-      "visual_action": "A hand slams the matte black Solstice can onto a block of clear ice, shattering it into a spray of crystal shards. On-screen text: 'STOP DRINKING WATERED-DOWN COFFEE'",
-      "audio_vo": "Loud, hyper-crisp ice-shattering crack layered with a deep, vibrating sub-bass drop."
+      "visual_action": "Extreme macro pull shot of a can tab popping, releasing an explosive plume of pressurized cold nitrogen mist directly into the camera lens. On-screen text: 'THIS ISN'T NORMAL COFFEE \u26a1'",
+      "audio_vo": "Hyper-crisp metallic snap followed by a loud, pressurized nitrogen blast and heavy bass drop."
     },
     {
       "shot_number": 2,
-      "scene_location": "INT. Studio - High Speed Rig",
-      "framing_and_lens": "MCU 50mm f/1.4",
-      "camera_movement": "Static",
-      "visual_action": "The tab is pulled, releasing a violent, pressurized plume of nitrogen mist spraying directly at the camera lens.",
-      "audio_vo": "Sharp, crisp metallic snap and pressurized hiss."
+      "scene_location": "INT. Studio - Macro Table",
+      "framing_and_lens": "Macro 100mm f/2.8",
+      "camera_movement": "Static (1000fps)",
+      "visual_action": "A hand slams the matte black Solstice can onto a block of clear ice, shattering it into a spray of crystal shards. On-screen text: 'NO WATER. NO SUGAR. PURE NITRO.'",
+      "audio_vo": "Loud, hyper-crisp ice-shattering crack layered with deep sub-bass vibration."
     },
     {
       "shot_number": 3,
       "scene_location": "INT. Studio - Liquid Tank",
       "framing_and_lens": "Macro 100mm f/2.8",
       "camera_movement": "Slow pan",
-      "visual_action": "Nitro cold brew pouring into a glass, showing the cascading waterfall effect of micro-bubbles.",
-      "audio_vo": "Velvety, bubbling liquid sound design."
+      "visual_action": "Nitro cold brew pouring into a glass, showing the cascading waterfall effect of micro-bubbles forming a thick velvet head. On-screen text: 'VELVET SMOOTH ENERGY'",
+      "audio_vo": "Velvety, bubbling liquid sound design with deep, smooth ambient synth."
     },
     {
       "shot_number": 4,
       "scene_location": "INT. Studio - Product Hero",
       "framing_and_lens": "Wide 35mm f/2.0",
       "camera_movement": "Orbit",
-      "visual_action": "The can sits on a dark slate surface, light catching the logo. On-screen text: 'CLAIM YOUR FREE TRIAL 4-PACK | TAP BELOW BEFORE STOCK RUNS OUT'",
-      "audio_vo": "Voiceover: Solstice Nitro. The dark side of energy."
+      "visual_action": "The can sits on a dark slate surface, dramatic light catching the metallic logo. High-contrast endcard overlay appears. On-screen text: 'CLAIM YOUR FREE 4-PACK NOW \u2014 TAP BELOW BEFORE STOCK RUNS OUT \u26a1'",
+      "audio_vo": "Voiceover: 'Solstice Nitro. Experience the dark side of energy. Tap below to claim your free 4-pack now.'"
     }
   ],
   "budget_breakdown": [
     {
       "category": "Pre-Production",
-      "line_item": "Creative direction, storyboarding, and scheduling",
+      "line_item": "Creative direction, storyboarding, and hook optimization analysis",
       "estimated_cost_usd": 2000.0
     },
     {
       "category": "Crew",
-      "line_item": "Director, DP, Gaffer, and Food Stylist",
+      "line_item": "Director, DP, Gaffer, and Food/Beverage Stylist",
       "estimated_cost_usd": 6000.0
     },
     {
       "category": "Equipment",
-      "line_item": "High-speed camera rental (Phantom VEO) and lighting package",
+      "line_item": "High-speed camera rental (Phantom VEO) and specialty macro lighting package",
       "estimated_cost_usd": 3500.0
     },
     {
       "category": "Post-Production",
-      "line_item": "Editing, color grading, and sound design",
+      "line_item": "Editing, high-retention text animation, color grading, and tactile sound design",
       "estimated_cost_usd": 2500.0
     },
     {
       "category": "AI Rendering",
-      "line_item": "Generative assets and AI-assisted texture enhancement",
+      "line_item": "Generative visual asset previs and texture enhancement",
       "estimated_cost_usd": 500.0
     }
   ],
