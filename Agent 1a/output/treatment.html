@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commercial Treatment: The Nitro Pulse</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --primary: #0f766e;
+      --border: #e2e8f0;
+      --table-header: #1e293b;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      margin: 0;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 48px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border);
+    }
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0f172a;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #334155;
+    }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+    h1 {
+      font-size: 28px;
+      color: #0f172a;
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .meta-box {
+      background: #f1f5f9;
+      border-left: 4px solid #0f766e;
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px 16px;
+      font-size: 14px;
+    }
+    .meta-label {
+      font-weight: 600;
+      color: #334155;
+    }
+    h2 {
+      font-size: 18px;
+      color: #0f172a;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 8px;
+      margin-top: 36px;
+      margin-bottom: 16px;
+    }
+    .callout {
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin: 16px 0;
+      color: #166534;
+      font-style: italic;
+    }
+    .callout strong {
+      font-style: normal;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13.5px;
+    }
+    th {
+      background: var(--table-header);
+      color: #ffffff;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+    .num {
+      text-align: right;
+    }
+    .total-row td {
+      background: #e2e8f0 !important;
+      font-weight: bold;
+      font-size: 14px;
+      color: #0f172a;
+    }
+    .total-amount {
+      color: #0f766e;
+      font-weight: 700;
+    }
+    .prompt-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12.5px;
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="action-bar">
+      <button class="btn btn-secondary" onclick="copyForGoogleDocs()">📋 Copy for Google Docs</button>
+      <button class="btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    </div>
+
+    <div id="doc-content">
+      <h1>Commercial Treatment: The Nitro Pulse</h1>
+      <div class="subtitle">Client Pitch & Production Treatment Document</div>
+
+      <div class="meta-box">
+        <div class="meta-label">Client:</div>
+        <div>Solstice Coffee Co.</div>
+        <div class="meta-label">Objective:</div>
+        <div>Launch a new nitro canned cold brew with a high-energy, premium cinematic spot.</div>
+        <div class="meta-label">Target Audience:</div>
+        <div>Urban young professionals and coffee enthusiasts aged 22-38.</div>
+        <div class="meta-label">Aesthetic Tone:</div>
+        <div>Dark, sleek, tactile, cinematic, high-contrast, moody, sophisticated.</div>
+      </div>
+
+      <h2>1. Creative Concept & Logline</h2>
+      <div class="callout">
+        <strong>Logline:</strong> A sensory journey into the velvet texture of Solstice Nitro, where darkness meets the sharp, refreshing snap of nitrogen-infused coffee.
+      </div>
+      <p><strong>Visual Direction:</strong></p>
+      <p>High-speed phantom camera work (1000fps) to capture liquid viscosity. Lighting utilizes hard, directional rim lighting to emphasize condensation on matte black surfaces. Color grade is crushed blacks with subtle cool blue highlights and warm, rich espresso brown tones.</p>
+
+      <h2>2. Pre-Visualization Prompts (Midjourney / Flux)</h2>
+      <div class="prompt-box">• Macro shot of a matte black aluminum can, condensation droplets, dramatic rim lighting, dark moody studio background, 8k resolution, cinematic lighting, shot on Arri Alexa 35, 100mm macro lens --ar 16:9</div>
+      <div class="prompt-box">• Extreme close up of nitro cold brew swirling in a glass, dark espresso liquid, cascading bubbles, high contrast, cinematic, sharp focus, volumetric lighting --ar 9:16</div>
+
+      <h2>3. Shot List</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 8%;">Shot #</th>
+            <th style="width: 22%;">Location</th>
+            <th style="width: 18%;">Framing & Lens</th>
+            <th style="width: 14%;">Movement</th>
+            <th style="width: 20%;">Action</th>
+            <th style="width: 18%;">Audio / VO</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>INT. Studio - Macro Table</td>
+            <td>Macro 100mm f/2.8</td>
+            <td>Slow push-in</td>
+            <td>Condensation beads sliding down the matte black surface of the can.</td>
+            <td>Deep, resonant bass thrum building in intensity.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>INT. Studio - High Speed Rig</td>
+            <td>MCU 50mm f/1.4</td>
+            <td>Static</td>
+            <td>The tab is pulled, audible sharp 'hiss' of nitrogen release.</td>
+            <td>Sharp, crisp metallic snap and pressurized hiss.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>INT. Studio - Liquid Tank</td>
+            <td>Macro 100mm f/2.8</td>
+            <td>Slow pan</td>
+            <td>Nitro cold brew pouring into a glass, showing the cascading 'waterfall' effect.</td>
+            <td>Velvety, bubbling liquid sound design.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>INT. Studio - Product Hero</td>
+            <td>Wide 35mm f/2.0</td>
+            <td>Orbit</td>
+            <td>The can sits on a dark slate surface, light catching the logo.</td>
+            <td>Voiceover: Solstice Nitro. The dark side of energy.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>4. Production Budget Estimate</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 25%;">Category</th>
+            <th style="width: 50%;">Line Item Description</th>
+            <th style="width: 25%;" class="num">Estimated Cost (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pre-Production</td>
+            <td>Creative direction, storyboarding, and scheduling</td>
+            <td class="num">$2,000.00</td>
+          </tr>
+          <tr>
+            <td>Crew</td>
+            <td>Director, DP, Gaffer, and Food Stylist</td>
+            <td class="num">$6,000.00</td>
+          </tr>
+          <tr>
+            <td>Equipment</td>
+            <td>High-speed camera rental (Phantom VEO) and lighting package</td>
+            <td class="num">$3,500.00</td>
+          </tr>
+          <tr>
+            <td>Post-Production</td>
+            <td>Editing, color grading, and sound design</td>
+            <td class="num">$2,500.00</td>
+          </tr>
+          <tr>
+            <td>AI Rendering</td>
+            <td>Generative assets and AI-assisted texture enhancement</td>
+            <td class="num">$500.00</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="2" style="text-align: right;">Total Estimated Production Budget:</td>
+            <td class="num total-amount">$14,500.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function copyForGoogleDocs() {
+      const content = document.getElementById('doc-content');
+      const range = document.createRange();
+      range.selectNode(content);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      try {
+        document.execCommand('copy');
+        alert('Copied to clipboard! You can now paste directly into a blank Google Doc (Cmd+V).');
+      } catch (err) {
+        alert('Could not copy automatically. Please select all and press Cmd+C.');
+      }
+      window.getSelection().removeAllRanges();
+    }
+  </script>
+</body>
+</html>
