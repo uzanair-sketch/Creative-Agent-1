@@ -1,15 +1,17 @@
 import os
 import json
+import time
 import warnings
+
+# Suppress minor platform deprecation/SSL warnings for clean output
+warnings.filterwarnings("ignore")
+
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from google.genai.errors import ServerError
-
-# Suppress minor platform deprecation/SSL warnings for clean output
-warnings.filterwarnings("ignore")
 
 # Automatically load environment variables from .env
 load_dotenv()
@@ -83,8 +85,7 @@ class CompetitorStrategyAgent:
             "gemini-3.6-flash",
             "gemini-3.5-flash",
             "gemini-3.1-flash-lite",
-            "gemini-3.8-flash",
-            "gemini-2.5-flash"
+            "gemini-3.8-flash"
         ]
 
     def _resolve_path(self, path: str) -> str:
@@ -138,34 +139,38 @@ class CompetitorStrategyAgent:
         ===============================
         """
 
-        # Model Fallback Execution Loop
+        # Model Fallback Execution Loop with Exponential Backoff
         last_exception = None
         for model_name in self.fallback_models:
-            try:
-                print(f"🚀 Attempting optimization with model: {model_name}...")
-                response = self.client.models.generate_content(
-                    model=model_name,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(
-                        system_instruction=system_instruction,
-                        temperature=0.3,
-                        response_mime_type="application/json",
-                        response_schema=StrategyOptimizationPackage,
-                    ),
-                )
+            for attempt in range(1, 3):
+                try:
+                    attempt_str = f" (attempt {attempt}/2)" if attempt > 1 else ""
+                    print(f"🚀 Attempting optimization with model: {model_name}{attempt_str}...", flush=True)
+                    response = self.client.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(
+                            system_instruction=system_instruction,
+                            temperature=0.3,
+                            response_mime_type="application/json",
+                            response_schema=StrategyOptimizationPackage,
+                        ),
+                    )
 
-                if hasattr(response, "parsed") and isinstance(response.parsed, StrategyOptimizationPackage):
-                    return response.parsed
+                    if hasattr(response, "parsed") and isinstance(response.parsed, StrategyOptimizationPackage):
+                        return response.parsed
 
-                result_json = json.loads(response.text)
-                return StrategyOptimizationPackage(**result_json)
+                    result_json = json.loads(response.text)
+                    return StrategyOptimizationPackage(**result_json)
 
-            except ServerError as e:
-                print(f"⚠️ Model {model_name} hit server load error (503). Retrying next fallback model...")
-                last_exception = e
-            except Exception as e:
-                print(f"⚠️ Error with model {model_name}: {e}. Retrying next model...")
-                last_exception = e
+                except ServerError as e:
+                    print(f"⚠️ Model {model_name} hit server load error (503). Waiting 2s before retry...", flush=True)
+                    last_exception = e
+                    time.sleep(2)
+                except Exception as e:
+                    print(f"⚠️ Error with model {model_name}: {e}. Retrying next model...", flush=True)
+                    last_exception = e
+                    break
 
         raise RuntimeError(f"All candidate models failed. Last error: {last_exception}")
 

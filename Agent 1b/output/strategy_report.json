@@ -1,52 +1,52 @@
 {
   "competitor_insights": [
     {
-      "competitor_name": "Blue Bottle Coffee",
-      "winning_creative_pattern": "Bright, minimalist, lifestyle-focused aesthetic with clean white backgrounds and soft, natural morning light.",
-      "creative_opportunity_gap": "Solstice will visually outperform by leaning heavily into a dark, moody, high-contrast 'after-hours' aesthetic with tactile ASMR sound design, capturing the premium nightlife-to-early-morning transition."
+      "competitor_name": "La Colombe Draft Latte",
+      "winning_creative_pattern": "Smooth macro pouring clips combined with lifestyle UGC overlays highlighting texture.",
+      "creative_opportunity_gap": "Visually underwhelms on kinetic impact and hyper-tactile audio; we can outperform using 1000fps ice destruction and pressurized nitrogen shock visuals."
     },
     {
-      "competitor_name": "Death Wish Coffee",
-      "winning_creative_pattern": "Aggressive, high-energy, heavy metal aesthetic focusing on extreme caffeine content and raw power.",
-      "creative_opportunity_gap": "Solstice will pivot from raw aggression to sophisticated, high-end sensory luxury, using ultra-slow-motion liquid physics and premium matte-black textures instead of loud graphics."
+      "competitor_name": "Super Coffee",
+      "winning_creative_pattern": "Problem-solution hooks emphasizing zero-sugar/high-protein claims with bright text banners.",
+      "creative_opportunity_gap": "Lacks moody aesthetic luxury; we can capture high-intent coffee purists by leaning into dark, cinematic luxury visuals with visceral sensory sound design."
     },
     {
-      "competitor_name": "La Colombe",
-      "winning_creative_pattern": "Fast-paced, cafe-centric lifestyle montages showing active urban professionals on the move.",
-      "creative_opportunity_gap": "Solstice will capture attention through hypnotic, macro-level liquid dynamics (the cascading nitro waterfall) that feel deeply satisfying and impossible to look away from."
+      "competitor_name": "Chamberlain Coffee",
+      "winning_creative_pattern": "Pastel color schemes, casual relaxed pacing, and soft ASMR pouring sounds for Gen-Z audience.",
+      "creative_opportunity_gap": "Completely misses high-energy, premium dark roast enthusiasts; our high-contrast, moody visual approach fills the luxury performance niche."
     }
   ],
   "high_retention_hooks": [
     {
       "hook_type": "Pattern Interrupt",
-      "visual_hook_description": "A hand aggressively slams a matte black Solstice can onto a solid block of clear ice, shattering it into a spray of crystal shards in 1000fps slow motion.",
-      "on_screen_text": "YOUR MORNING ROUTINE IS DEAD.",
+      "visual_hook_description": "A hand violently slams a matte black Solstice can onto a thick block of clear ice at 1000fps, shattering crystal shards directly into the camera lens.",
+      "on_screen_text": "STOP DRINKING WATERED-DOWN COFFEE",
       "audio_hook": "Loud, hyper-crisp ice-shattering crack layered with a deep, vibrating sub-bass drop.",
-      "retention_rationale": "High kinetic energy and physical destruction in the first 0.5 seconds instantly break the passive scrolling state, forcing the user to stop and look."
+      "retention_rationale": "Violent physical impact combined with macro ice dynamics forces an immediate scroll-stop within the first 0.5 seconds."
     },
     {
       "hook_type": "Sensory Shock",
-      "visual_hook_description": "An extreme close-up of the can tab popping open, releasing a violent, pressurized plume of nitrogen mist spraying directly at the camera lens.",
-      "on_screen_text": "STOP DRINKING FLAT COFFEE.",
-      "audio_hook": "An amplified, metallic 'SNAP' followed by an intense, lingering pneumatic hiss.",
-      "retention_rationale": "The direct-to-camera spray creates a pseudo-3D depth effect that triggers a physical blink reflex, driving immediate engagement."
+      "visual_hook_description": "Extreme macro top-down view of nitrogen valve popping with explosive white mist blowing condensation directly across the camera lens.",
+      "on_screen_text": "WARNING: HIGH-PRESSURE NITRO INSIDE",
+      "audio_hook": "Explosive pressurized PSHHH snap with dynamic stereo panning.",
+      "retention_rationale": "Simulates 3D environmental reaction on mobile screens, triggering a visceral sensory response."
     },
     {
       "hook_type": "Curiosity Gap",
-      "visual_hook_description": "A reverse-motion pour where dark, velvety espresso liquid and cascading micro-bubbles defy gravity, rushing upward back into a floating matte black can.",
-      "on_screen_text": "THIS ISN'T REGULAR COLD BREW.",
-      "audio_hook": "A low-frequency, swirling vacuum sound effect that resolves into a crisp metallic click.",
-      "retention_rationale": "Visual anomalies and gravity-defying physics trigger the brain's curiosity mechanism, forcing the viewer to watch longer to make sense of the image."
+      "visual_hook_description": "Nitro cold brew pouring in reverse slow-motion, creating an inverted cascading cream waterfall effect inside a clear glass.",
+      "on_screen_text": "WHY IS THIS COFFEE FLOWING UPWARDS?",
+      "audio_hook": "Hypnotic low-frequency hum fading rapidly into crisp liquid crackle.",
+      "retention_rationale": "Visual trickery creates a cognitive pause, driving viewers to watch the next 3 seconds to resolve the confusion."
     }
   ],
   "selected_primary_hook": {
     "hook_type": "Pattern Interrupt",
-    "visual_hook_description": "A hand aggressively slams a matte black Solstice can onto a solid block of clear ice, shattering it into a spray of crystal shards in 1000fps slow motion.",
-    "on_screen_text": "YOUR MORNING ROUTINE IS DEAD.",
+    "visual_hook_description": "A hand violently slams a matte black Solstice can onto a thick block of clear ice at 1000fps, shattering crystal shards directly into the camera lens.",
+    "on_screen_text": "STOP DRINKING WATERED-DOWN COFFEE",
     "audio_hook": "Loud, hyper-crisp ice-shattering crack layered with a deep, vibrating sub-bass drop.",
-    "retention_rationale": "High kinetic energy and physical destruction in the first 0.5 seconds instantly break the passive scrolling state, forcing the user to stop and look."
+    "retention_rationale": "Violent physical impact combined with macro ice dynamics forces an immediate scroll-stop within the first 0.5 seconds."
   },
-  "optimized_cta": "Tap to unlock the velvet rush. Order your 12-pack now.",
+  "optimized_cta": "CLAIM YOUR FREE TRIAL 4-PACK | TAP BELOW BEFORE STOCK RUNS OUT",
   "enriched_treatment": {
     "brief_analysis": {
       "client_name": "Solstice Coffee Co.",
@@ -64,10 +64,10 @@
       "logline": "A sensory journey into the velvet texture of Solstice Nitro, where darkness meets the sharp, refreshing snap of nitrogen-infused coffee.",
       "visual_direction": "High-speed phantom camera work (1000fps) to capture liquid viscosity. Lighting utilizes hard, directional rim lighting to emphasize condensation on matte black surfaces. Color grade is crushed blacks with subtle cool blue highlights and warm, rich espresso brown tones.",
       "color_palette": [
-        "#0A0A0A",
-        "#1A1A1A",
-        "#4A3728",
-        "#B8860B"
+        "#0A0A0A treatment_title",
+        " #1A1A1A",
+        " #4A3728",
+        " #B8860B"
       ],
       "ai_previs_prompts": [
         "Macro shot of a matte black aluminum can, condensation droplets, dramatic rim lighting, dark moody studio background, 8k resolution, cinematic lighting, shot on Arri Alexa 35, 100mm macro lens --ar 16:9",
@@ -80,7 +80,7 @@
         "scene_location": "INT. Studio - Macro Table",
         "framing_and_lens": "Macro 100mm f/2.8",
         "camera_movement": "Static (1000fps)",
-        "visual_action": "A hand slams the matte black Solstice can onto a block of clear ice, shattering it into a spray of crystal shards. On-screen text: 'YOUR MORNING ROUTINE IS DEAD.'",
+        "visual_action": "A hand slams the matte black Solstice can onto a block of clear ice, shattering it into a spray of crystal shards. On-screen text: 'STOP DRINKING WATERED-DOWN COFFEE'",
         "audio_vo": "Loud, hyper-crisp ice-shattering crack layered with a deep, vibrating sub-bass drop."
       },
       {
@@ -96,7 +96,7 @@
         "scene_location": "INT. Studio - Liquid Tank",
         "framing_and_lens": "Macro 100mm f/2.8",
         "camera_movement": "Slow pan",
-        "visual_action": "Nitro cold brew pouring into a glass, showing the cascading 'waterfall' effect of micro-bubbles.",
+        "visual_action": "Nitro cold brew pouring into a glass, showing the cascading waterfall effect of micro-bubbles.",
         "audio_vo": "Velvety, bubbling liquid sound design."
       },
       {
@@ -104,7 +104,7 @@
         "scene_location": "INT. Studio - Product Hero",
         "framing_and_lens": "Wide 35mm f/2.0",
         "camera_movement": "Orbit",
-        "visual_action": "The can sits on a dark slate surface, light catching the logo. On-screen text: 'Tap to unlock the velvet rush. Order your 12-pack now.'",
+        "visual_action": "The can sits on a dark slate surface, light catching the logo. On-screen text: 'CLAIM YOUR FREE TRIAL 4-PACK | TAP BELOW BEFORE STOCK RUNS OUT'",
         "audio_vo": "Voiceover: Solstice Nitro. The dark side of energy."
       }
     ],
